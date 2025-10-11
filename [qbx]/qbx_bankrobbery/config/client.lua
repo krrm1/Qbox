@@ -1,7 +1,7 @@
 return {
-    useTarget = false,
+    useTarget = true,
 
-    debugPoly = false,
+    debugPoly = true,
 
     fingerprintChance = 50, -- Chance of dropping a fingerprint if not wearing gloves
 

@@ -1,6 +1,6 @@
 return {
-    useTarget = false,
-    debugPoly = false,
+    useTarget = true,
+    debugPoly = true,
 
     peds = {
         { -- Cityhall Ped

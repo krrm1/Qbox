@@ -1,6 +1,6 @@
 return {
-    useTarget = false,
-    debugPoly = false,
+    useTarget = true,
+    debugPoly = true,
     useBlips = true,
     allowedVehicles = {
         { model = 'taxi', label = locale('info.taxi_label_1') }

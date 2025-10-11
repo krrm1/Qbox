@@ -1,6 +1,6 @@
 return {
     useTarget = true,
-    debugPoly = false,
+    debugPoly = true,
     peds = {
         {
             model = 's_m_y_garbage',

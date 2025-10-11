@@ -1,6 +1,6 @@
 return {
     useTarget = false,
-    polyDebug = false,
+    polyDebug = true,
 
     dirtLevel = 0.1, -- Threshold for the dirt level to be counted as dirty
     locations = {

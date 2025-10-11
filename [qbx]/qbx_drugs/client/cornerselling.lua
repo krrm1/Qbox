@@ -1,6 +1,6 @@
 local config = require 'config.client'
 local cornerselling = false
-local hasTarget = false
+local hasTarget = true
 local lastPed = {}
 local stealingPed = nil
 local stealData = {}

@@ -1,5 +1,5 @@
 return {
-    useTarget = false,
+    useTarget = true,
     zones = {
         sandyOccasions = {
             businessName = "Vehicle Sales Contract - Larry's Vehicle Sales",

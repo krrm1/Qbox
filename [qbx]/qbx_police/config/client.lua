@@ -1,6 +1,6 @@
 return {
-    useTarget = false,
-    polyDebug = false,
+    useTarget = true,
+    polyDebug = true,
 
     handcuffItems = 'handcuffs',
     policeHelicopter = 'polmav',
@@ -123,7 +123,7 @@ return {
         -- Radars will fine the driver if the vehicle is over the defined speed limit
         -- Regardless of the speed, If the vehicle is flagged it sends a notification to the police
         -- It is disable by default, change to true to enable!
-        enableRadars = false,
+        enableRadars = true,
         useMPH = true, -- If true, it uses the imperial system. If false, it uses the metric system.
         locations = {
             {coords = vec4(-623.44421386719, -823.08361816406, 25.25704574585, 145.0), speedlimit = 35},
