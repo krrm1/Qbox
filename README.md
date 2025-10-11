@@ -1,4 +1,5 @@
-![banner](https://github.com/user-attachments/assets/e1ad0746-67bb-4273-a565-c3a8ce4118b2)
+
+![banner](https://github.com/user-attachments/assets/16921340-0b62-45ed-b150-4685d091c464)
 
 _<p align="center">"And then there was Qbox"</p>_
 
