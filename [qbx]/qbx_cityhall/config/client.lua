@@ -11,7 +11,7 @@ return {
             zoneOptions = { -- Used for when UseTarget is false
                 length = 3.0,
                 width = 3.0,
-                debugPoly = false,
+                debugPoly = true,
             },
         },
     },
