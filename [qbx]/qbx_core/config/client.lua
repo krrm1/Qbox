@@ -2,7 +2,7 @@ return {
     statusIntervalSeconds = 5, -- how often to check hunger/thirst status to remove health if 0.
     loadingModelsTimeout = 30000, -- Waiting time for ox_lib to load the models before throws an error, for low specs pc
 
-    pauseMapText = 'Powered by Qbox', -- Text shown above the map when ESC is pressed. If left empty 'FiveM' will appear
+    pauseMapText = 'Powered by MY ASS', -- Text shown above the map when ESC is pressed. If left empty 'FiveM' will appear
 
     characters = {
         useExternalCharacters = false, -- Whether you have an external character management resource. (If true, disables the character management inside the core)
@@ -54,26 +54,26 @@ return {
     discord = {
         enabled = true, -- This will enable or disable the built in discord rich presence.
 
-        appId = '1024981890798731345', -- This is the Application ID (Replace this with you own)
+        appId = '1114578244327460965', -- This is the Application ID (Replace this with you own)
 
         largeIcon = { -- To set this up, visit https://forum.cfx.re/t/how-to-updated-discord-rich-presence-custom-image/157686
-            icon = 'duck', -- Here you will have to put the image name for the 'large' icon.
-            text = 'Qbox Ducky', -- Here you can add hover text for the 'large' icon.
+            icon = 'myLogo', -- Here you will have to put the image name for the 'large' icon.
+            text = 'I SEee YoU 🤨', -- Here you can add hover text for the 'large' icon.
         },
 
         smallIcon = {
-            icon = 'logo_name', -- Here you will have to put the image name for the 'small' icon.
+            icon = 'myLogo', -- Here you will have to put the image name for the 'small' icon.
             text = 'This is a small icon with text', -- Here you can add hover text for the 'small' icon.
         },
 
         firstButton = {
             text = 'Qbox Discord',
-            link = 'https://discord.gg/Z6Whda5hHA',
+            link = 'https://discord.gg/krrm1',
         },
 
         secondButton = {
             text = 'Main Website',
-            link = 'https://www.qbox.re/',
+            link = 'https://www.krrm1.com',
         }
     },
 

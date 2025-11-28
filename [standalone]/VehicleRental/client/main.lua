@@ -1,8 +1,10 @@
 local pedsSpawned = false
 local inRangeRental = false
 
-local function SpawnVehicleRented(rentalname)
-        local vehNetId = lib.callback.await('VehicleRental:rent', false, 't20', vec3(278.78, -340.38, 44.92))
+local function SpawnVehicleRented(rentalname, VehicleModel, VehicleSpawn)
+    local veh = VehicleModel
+    local spawn = VehicleSpawn
+        local vehNetId = lib.callback.await('VehicleRental:rent', false, veh, spawn)
         if not vehNetId then return end
         local veh
         repeat
@@ -20,7 +22,6 @@ local function SpawnVehicleRented(rentalname)
         SetVehicleOnGroundProperly(veh)
         SetVehicleRadioEnabled(veh, true)
         SetVehRadioStation(veh, 'OFF')
-        print(rentalname)
 end
 
 local function deletePeds()
@@ -49,16 +50,34 @@ local function spawnPeds()
         TaskStartScenarioInPlace(ped, current.scenario, 0, true)
         pedsSpawned = true
         if config.useTarget  then
-
             if pedsSpawned == true then
                 exports.ox_target:addLocalEntity(ped, {{ 
-                    name = 'Rent_Vehicle',
+                    name = 'Rent_Vehicle_target',
                     icon = 'fas fa-car-side',
                     label = 'Rent Vehicle | ' .. current.rentalname,
                     distance = 1.5,
-                    debug = true,
+                    debug = config.debugPoly,
                     onSelect = function()
-                        SpawnVehicleRented()
+                        if current.VehiclesList == nil then print(':(') return end
+                            local options = {}
+
+                        for veh, desc in pairs(current.VehiclesList) do
+                            options[#options+1] = {
+                                title = veh,
+                                description = desc,
+                                onSelect = function()
+                                    SpawnVehicleRented(current.rentalname, veh, current.VehicleSpawn)
+                                end
+                            }
+                        end
+
+                        lib.registerContext({
+                            id = 'Vehicle_Rental_Menu_target',
+                            title = 'Vehicle Rental',
+                            options = options
+                        })
+
+                        lib.showContext('Vehicle_Rental_Menu_target')
                     end
                 }})
             end
@@ -66,14 +85,14 @@ local function spawnPeds()
             local options = current.zoneOptions
             if options then
                 lib.zones.box({
-                    name = 'Rent_Vehicle',
+                    name = 'Rent_Vehicle_TextUI',
                     coords = current.coords.xyz,
                     size = vec3(2, 2, 3),
                     rotation = current.coords.w,
-                    debug = true,
+                    debug = config.debugPoly,
                     onEnter = function()
-                       inRangeRental = true
-                       print(inRangeRental)
+                        inRangeRental = true
+                        print(inRangeRental)
                         lib.showTextUI('[E] Rent Vehicle | ' .. current.rentalname)
                     end,
                     onExit = function()
@@ -83,7 +102,26 @@ local function spawnPeds()
                     end,
                     inside = function()
                         if IsControlJustPressed(0, 38) then
-                            SpawnVehicleRented(current.rentalname)
+                            if current.VehiclesList == nil then print(':(') return end
+                            local options = {}
+
+                            for veh, desc in pairs(current.VehiclesList) do
+                                options[#options+1] = {
+                                    title = veh,
+                                    description = desc,
+                                    onSelect = function()
+                                        SpawnVehicleRented(current.rentalname, veh, current.VehicleSpawn)
+                                    end
+                                }
+                            end
+
+                            lib.registerContext({
+                                id = 'Vehicle_Rental_Menu_TextUI',
+                                title = 'Vehicle Rental',
+                                options = options
+                            })
+
+                            lib.showContext('Vehicle_Rental_Menu_TextUI')
                             lib.hideTextUI()
                         end
                     end,
@@ -95,24 +133,20 @@ end
 
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    -- initBlips()
     spawnPeds()
 end)
 
 AddEventHandler('onResourceStart', function(resource)
     if resource ~= cache.resource then return end
-    -- initBlips()
     spawnPeds()
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
-    -- deleteBlips()
     deletePeds()
 end)
 
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= cache.resource then return end
-    -- deleteBlips()
     deletePeds()
     inRangeRental = false 
 end)
