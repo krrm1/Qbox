@@ -1,7 +1,30 @@
 local pedsSpawned = false
 local inRangeRental = false
 
-local function SpawnVehicleRented(rentalname, VehicleModel, VehicleSpawn)
+local function createBlip(data)
+    local blip = AddBlipForCoord(data.coords.x, data.coords.y, data.coords.z)
+    SetBlipSprite(blip, data.blip.sprite or 1)
+    SetBlipDisplay(blip, data.blip.display or 4)
+    SetBlipScale(blip, data.blip.scale or 1.0)
+    SetBlipColour(blip, data.blip.colour or 1)
+    SetBlipAsShortRange(blip, config.bilpsSettings.shortRange or false)
+    BeginTextCommandSetBlipName('STRING')
+    AddTextComponentString(data.blip.label)
+    EndTextCommandSetBlipName(blip)
+    return blip
+end
+
+local function deleteBlips()
+    if not blips then return end
+    for i = 1, #blips do
+        local blip = blips[i]
+        if DoesBlipExist(blip) then
+            RemoveBlip(blip)
+        end
+    end
+    blips = {}
+end
+local function SpawnVehicleRented(VehicleModel, VehicleSpawn)
     local veh = VehicleModel
     local spawn = VehicleSpawn
         local vehNetId = lib.callback.await('VehicleRental:rent', false, veh, spawn)
@@ -24,17 +47,6 @@ local function SpawnVehicleRented(rentalname, VehicleModel, VehicleSpawn)
         SetVehRadioStation(veh, 'OFF')
 end
 
-local function deletePeds()
-    if not config.peds or not next(config.peds) or not pedsSpawned then return end
-    for i = 1, #config.peds do
-        local current = config.peds[i]
-        if current.pedHandle then
-            DeletePed(current.pedHandle)
-        end
-    end
-end
-
-
 local function spawnPeds()
     if not config.peds or not next(config.peds) or pedsSpawned then return end
     for i = 1, #config.peds do
@@ -49,6 +61,7 @@ local function spawnPeds()
         SetBlockingOfNonTemporaryEvents(ped, true)
         TaskStartScenarioInPlace(ped, current.scenario, 0, true)
         pedsSpawned = true
+        
         if config.useTarget  then
             if pedsSpawned == true then
                 exports.ox_target:addLocalEntity(ped, {{ 
@@ -63,10 +76,10 @@ local function spawnPeds()
 
                         for veh, desc in pairs(current.VehiclesList) do
                             options[#options+1] = {
-                                title = veh,
-                                description = desc,
+                                title = desc.label,
+                                description = desc.price .. ' $',
                                 onSelect = function()
-                                    SpawnVehicleRented(current.rentalname, veh, current.VehicleSpawn)
+                                    SpawnVehicleRented(veh, current.VehicleSpawn)
                                 end
                             }
                         end
@@ -128,9 +141,20 @@ local function spawnPeds()
                 })
             end
         end
+        if not config.bilpsSettings.showBlip or not current.blip then return end
+        createBlip({blip = current.blip, coords = current.coords})
     end
 end
 
+local function deletePeds()
+    if not config.peds or not next(config.peds) or not pedsSpawned then return end
+    for i = 1, #config.peds do
+        local current = config.peds[i]
+        if current.pedHandle then
+            DeletePed(current.pedHandle)
+        end
+    end
+end
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     spawnPeds()
@@ -143,10 +167,12 @@ end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     deletePeds()
+    deleteBlips()
 end)
 
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= cache.resource then return end
-    deletePeds()
-    inRangeRental = false 
+        deletePeds()
+        deleteBlips()
+    inRangeRental = false
 end)
