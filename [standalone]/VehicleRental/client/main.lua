@@ -1,8 +1,8 @@
 local pedsSpawned = false
 local inRangeRental = false
 
-local function createBlip(data)
-    local blip = AddBlipForCoord(data.coords.x, data.coords.y, data.coords.z)
+local function CreateBlip(data)
+    local blip = AddBlipForCoord(data.blip.coords.x, data.blip.coords.y, data.blip.coords.z)
     SetBlipSprite(blip, data.blip.sprite or 1)
     SetBlipDisplay(blip, data.blip.display or 4)
     SetBlipScale(blip, data.blip.scale or 1.0)
@@ -14,7 +14,7 @@ local function createBlip(data)
     return blip
 end
 
-local function deleteBlips()
+local function DeleteBlips()
     if not blips then return end
     for i = 1, #blips do
         local blip = blips[i]
@@ -41,67 +41,67 @@ local function SpawnVehicleRented(VehicleModel, VehicleSpawn)
         SetVehicleIsStolen(veh, false)
         SetVehicleIsWanted(veh, false)
         SetVehicleEngineOn(veh, true, true, true)
+        SetVehicleFuelLevel(veh, 100)
         SetPedIntoVehicle(cache.ped, veh, -1)
         SetVehicleOnGroundProperly(veh)
         SetVehicleRadioEnabled(veh, true)
         SetVehRadioStation(veh, 'OFF')
 end
 
-local function spawnPeds()
-    if not config.peds or not next(config.peds) or pedsSpawned then return end
-    for i = 1, #config.peds do
+local function CreateRental()
+    if not config.RentalConfing or not next(config.RentalConfing) or pedsSpawned then return end
 
-        local current = config.peds[i]
-        current.model = type(current.model) == 'string' and joaat(current.model) or current.model
-        lib.requestModel(current.model, 5000)
-        local ped = CreatePed(0, current.model, current.coords.x, current.coords.y, current.coords.z, current.coords.w, false, false)
-        SetModelAsNoLongerNeeded(current.model)
+    for i = 1, #config.RentalConfing do
+        local current = config.RentalConfing[i]
+
+        current.ped.model = type(current.ped.model) == 'string' and joaat(current.ped.model) or current.ped.model
+        lib.requestModel(current.ped.model, 5000)
+        
+        local ped = CreatePed(0, current.ped.model, current.ped.coords.x, current.ped.coords.y, current.ped.coords.z, current.ped.coords.w, false, false)
+        SetModelAsNoLongerNeeded(current.ped.model)
         FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
         SetBlockingOfNonTemporaryEvents(ped, true)
-        TaskStartScenarioInPlace(ped, current.scenario, 0, true)
-        pedsSpawned = true
-        
-        if config.useTarget  then
-            if pedsSpawned == true then
-                exports.ox_target:addLocalEntity(ped, {{ 
-                    name = 'Rent_Vehicle_target',
-                    icon = 'fas fa-car-side',
-                    label = 'Rent Vehicle | ' .. current.rentalname,
-                    distance = 1.5,
-                    debug = config.debugPoly,
-                    onSelect = function()
-                        if current.VehiclesList == nil then print(':(') return end
-                            local options = {}
+        TaskStartScenarioInPlace(ped, current.ped.scenario, 0, true)
 
-                        for veh, desc in pairs(current.VehiclesList) do
-                            options[#options+1] = {
-                                title = desc.label,
-                                description = desc.price .. ' $',
-                                onSelect = function()
-                                    SpawnVehicleRented(veh, current.VehicleSpawn)
-                                end
-                            }
-                        end
-
-                        lib.registerContext({
-                            id = 'Vehicle_Rental_Menu_target',
-                            title = 'Vehicle Rental',
-                            options = options
-                        })
-
-                        lib.showContext('Vehicle_Rental_Menu_target')
+        if config.useTarget then
+            exports.ox_target:addLocalEntity(ped, {{
+                name = 'Rent_Vehicle_target',
+                icon = 'fas fa-car-side',
+                label = 'Rent Vehicle | ' .. current.rentalname,
+                distance = 1.5,
+                debug = config.debugPoly,
+                onSelect = function()
+                    if not current.VehiclesList then print(':(') return end
+                    
+                    local options = {}
+                    for veh, desc in pairs(current.VehiclesList) do
+                        options[#options+1] = {
+                            title = desc.label,
+                            description = desc.price .. ' $',
+                            onSelect = function()
+                                SpawnVehicleRented(veh, current.VehicleSpawn)
+                            end
+                        }
                     end
-                }})
-            end
+
+                    lib.registerContext({
+                        id = 'Vehicle_Rental_Menu_target',
+                        title = 'Vehicle Rental',
+                        options = options
+                    })
+
+                    lib.showContext('Vehicle_Rental_Menu_target')
+                end
+            }})
         else
             local options = current.zoneOptions
             if options then
                 lib.zones.box({
                     name = 'Rent_Vehicle_TextUI',
-                    coords = current.coords.xyz,
+                    coords = current.ped.coords.xyz,
                     size = vec3(2, 2, 3),
-                    rotation = current.coords.w,
+                    rotation = current.ped.coords.w,
                     debug = config.debugPoly,
                     onEnter = function()
                         inRangeRental = true
@@ -115,15 +115,15 @@ local function spawnPeds()
                     end,
                     inside = function()
                         if IsControlJustPressed(0, 38) then
-                            if current.VehiclesList == nil then print(':(') return end
+                            if not current.VehiclesList then print(':(') return end
                             local options = {}
 
                             for veh, desc in pairs(current.VehiclesList) do
                                 options[#options+1] = {
-                                    title = veh,
-                                    description = desc,
+                                    title = desc.label,
+                                    description = desc.price .. ' $',
                                     onSelect = function()
-                                        SpawnVehicleRented(current.rentalname, veh, current.VehicleSpawn)
+                                        SpawnVehicleRented(veh, current.VehicleSpawn)
                                     end
                                 }
                             end
@@ -141,12 +141,15 @@ local function spawnPeds()
                 })
             end
         end
-        if not config.bilpsSettings.showBlip or not current.blip then return end
-        createBlip({blip = current.blip, coords = current.coords})
+
+        if config.bilpsSettings.showBlip and current.blip then
+            CreateBlip({blip = current.blip, coords = current.coords})
+        end
     end
+    pedsSpawned = true
 end
 
-local function deletePeds()
+local function DeleteRental()
     if not config.peds or not next(config.peds) or not pedsSpawned then return end
     for i = 1, #config.peds do
         local current = config.peds[i]
@@ -157,22 +160,22 @@ local function deletePeds()
 end
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    spawnPeds()
+    CreateRental()
 end)
 
 AddEventHandler('onResourceStart', function(resource)
     if resource ~= cache.resource then return end
-    spawnPeds()
+    CreateRental()
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
-    deletePeds()
-    deleteBlips()
+    DeleteRental()
+    DeleteBlips()
 end)
 
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= cache.resource then return end
-        deletePeds()
-        deleteBlips()
+    DeleteRental()
+    DeleteBlips()
     inRangeRental = false
 end)
